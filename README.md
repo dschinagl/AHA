@@ -4,7 +4,19 @@
 
 Official code for the ECCV 2026 paper **"Learn to Rank: Visual Attribution by Learning Importance Ranking"** (AHA — Amortized Hybrid Attribution).
 
+[![arXiv paper](https://img.shields.io/badge/arXiv-2604.05819-B31B1B?logo=arxiv&logoColor=white)](https://arxiv.org/abs/2604.05819)
+[![YouTube video](https://img.shields.io/badge/YouTube-Video-FF0000?logo=youtube&logoColor=white)](https://www.youtube.com/watch?v=Lq7KKjG-kus)
+
 An explainer network is trained to predict, for a frozen target classifier, a dense attribution map whose ranking directly optimizes the (otherwise non-differentiable) Deletion and Insertion metrics via a Gumbel-Sinkhorn relaxation of sorting. At inference, the explainer produces a pixel-level attribution map in a single forward pass.
+
+<p align="left">
+  <a href="https://www.youtube.com/watch?v=Lq7KKjG-kus">
+    <img src="https://img.youtube.com/vi/Lq7KKjG-kus/hqdefault.jpg" alt="Learn to Rank — watch the video on YouTube" width="480">
+  </a>
+</p>
+<p align="left">
+  <a href="https://www.youtube.com/watch?v=Lq7KKjG-kus">▶ Watch the video on YouTube</a>
+</p>
 
 ## Repository structure
 
