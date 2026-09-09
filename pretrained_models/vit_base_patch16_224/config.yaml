@@ -1,0 +1,26 @@
+seed: 42
+dataset:
+  _target_: aha.data.imagenet.build_imagenet
+  root: ???  # Set to your local ImageNet directory.
+  train_split: train
+  val_split: val
+  num_samples: null
+  subset_seed: 42
+base_model:
+  _target_: aha.models.vit_timm.VitBasePatch16_224
+  pretrained_tag: vit_base_patch16_224.orig_in21k_ft_in1k
+explainer:
+  _target_: aha.explainer.dinov3_dpt.Dinov3DptExplainer
+  dinov3_path: dinov3
+  backbone_name: dinov3_vitl16
+  backbone_weights: ???  # Set to your downloaded DINOv3 ViT-L/16 weights (.pth).
+method:
+  ref_im_blur_kernel_size: 37
+  ref_im_blur_sigma: 37.0
+eval:
+  split: val
+  percentile_step_pct: 0.05
+  ref_im: mean
+  cls_to_eval: prediction
+  batch_size: 32
+  num_workers: 4

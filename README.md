@@ -25,6 +25,8 @@ configs/train.yaml          Hydra config (overrides on top of the defaults in sr
 scripts/train.py            Training entry point
 scripts/eval.py             Evaluation entry point (deletion/insertion AUC on a trained checkpoint)
 scripts/demo.py             Runs the explainer on a handful of standalone images
+pretrained_models/          Released explainer weights, one folder per target classifier
+assets/demo/                Example images for the demo script
 src/aha/
   config.py                 Structured config schema (Hydra ConfigStore)
   data/                     ImageNet dataset construction
@@ -55,13 +57,17 @@ The pretrained DINOv3 weights themselves are gated by Meta's license — request
 
 The target classifier (`timm`'s `vit_base_patch16_224.orig_in21k_ft_in1k`) is downloaded automatically from the Hugging Face Hub on first use.
 
+**Mandatory config values.** Fields marked `???` (`dataset.root` and `explainer.backbone_weights`) must be filled in, either by editing the config file, or by passing them on the command line as shown below.
+
 ## Training
 
 ```bash
-uv run torchrun --nproc_per_node=<num_gpus> scripts/train.py
+uv run torchrun --nproc_per_node=<num_gpus> scripts/train.py \
+  dataset.root=/path/to/imagenet \
+  explainer.backbone_weights=/path/to/dinov3_vitl16_pretrain_lvd1689m-8aa4cbdd.pth
 ```
 
-Every config value (see `src/aha/config.py`) can be overridden on the command line, e.g.:
+Both paths can equally well be written into `configs/train.yaml`. Every other config value (see `src/aha/config.py`) is overridable the same way, e.g.:
 
 ```bash
 uv run torchrun --nproc_per_node=4 scripts/train.py training.batch_size=32 method.ref_im=blur
@@ -75,15 +81,30 @@ Each run writes to a timestamped folder under `training.output_dir` (default `./
 uv run torchrun --nproc_per_node=<num_gpus> scripts/eval.py <artifacts_dir> [--checkpoint weights_final.pt] [key=value ...]
 ```
 
-`<artifacts_dir>` is a folder produced by `train.py`; the evaluation config is loaded from its `config.yaml` and can be overridden the same way as training (e.g. `eval.split=val eval.ref_im=black eval.cls_to_eval=ground_truth`). This computes the pixel-level deletion/insertion AUC, appends the result to `<artifacts_dir>/eval_metrics.yaml`, and saves 50 random qualitative visualizations (input | heatmap | overlay) to a timestamped subfolder.
+`<artifacts_dir>` is a folder produced by `train.py`. The evaluation config is loaded from its `config.yaml` and can be overridden the same way as training (e.g. `eval.split=val eval.ref_im=black eval.cls_to_eval=ground_truth`). This computes the pixel-level deletion/insertion AUC, appends the result to `<artifacts_dir>/eval_metrics.yaml`, and saves 50 random qualitative visualizations (input | heatmap | overlay).
+
+## Pretrained model
+
+`pretrained_models/vit_base_patch16_224/` holds an explainer trained for the ViT-B/16 target classifier: the resolved `config.yaml` of that run plus `weights_final.pt` (explainer weights only. The frozen DINOv3 backbone is not redistributed here, obtain it as described under [Setup](#setup)).
+
+The folder has the same layout as a training run, so it can be passed to `eval.py` and `demo.py` directly:
+
+```bash
+uv run torchrun --nproc_per_node=1 scripts/eval.py pretrained_models/vit_base_patch16_224 \
+  dataset.root=/path/to/imagenet \
+  explainer.backbone_weights=/path/to/dinov3_vitl16_pretrain_lvd1689m-8aa4cbdd.pth
+```
 
 ## Demo
 
-Runs the explainer on a handful of standalone images (using each image's own top-1 prediction as the target class):
+Runs the explainer on a handful of standalone images, using each image's own top-1 prediction as the target class. No dataset needed — only the explainer weights and the DINOv3 backbone:
 
 ```bash
-uv run python scripts/demo.py <artifacts_dir> [--images assets/demo] [--output assets/demo/output]
+uv run python scripts/demo.py pretrained_models/vit_base_patch16_224 \
+  explainer.backbone_weights=/path/to/dinov3_vitl16_pretrain_lvd1689m-8aa4cbdd.pth
 ```
+
+Reads from `assets/demo` and writes to `assets/demo/output` by default; both are configurable via `--images` and `--output`, and any config value can be overridden as `key=value`.
 
 ## Acknowledgements
 

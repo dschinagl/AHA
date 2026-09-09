@@ -20,9 +20,11 @@ def main() -> None:
     parser.add_argument("--checkpoint", default="weights_final.pt")
     parser.add_argument("--images", type=Path, default=Path("assets/demo"))
     parser.add_argument("--output", type=Path, default=Path("assets/demo/output"))
+    parser.add_argument("overrides", nargs="*")
     args = parser.parse_args()
 
-    cfg: Config = OmegaConf.merge(OmegaConf.structured(Config), OmegaConf.load(args.artifacts_dir / "config.yaml"))
+    saved_cfg = OmegaConf.load(args.artifacts_dir / "config.yaml")
+    cfg: Config = OmegaConf.merge(OmegaConf.structured(Config), saved_cfg, OmegaConf.from_dotlist(args.overrides))
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     checkpoint_path = args.artifacts_dir / args.checkpoint

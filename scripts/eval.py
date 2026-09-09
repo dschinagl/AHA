@@ -64,8 +64,8 @@ def main() -> None:
     if ctx.is_distributed:
         dataset = Subset(dataset, range(ctx.rank, len(dataset), ctx.world_size))
     loader = DataLoader(
-        dataset, batch_size=cfg.training.batch_size, shuffle=False,
-        num_workers=cfg.training.num_workers, pin_memory=True, drop_last=False,
+        dataset, batch_size=cfg.eval.batch_size, shuffle=False,
+        num_workers=cfg.eval.num_workers, pin_memory=True, drop_last=False,
     )
 
     total_desc = total_asc = total_count = 0.0
@@ -111,6 +111,7 @@ def main() -> None:
             "cls_to_eval": cfg.eval.cls_to_eval,
             "ref_im": cfg.eval.ref_im,
             "percentile_step_pct": cfg.eval.percentile_step_pct,
+            "batch_size": cfg.eval.batch_size,
             "metrics": metrics,
         }
 

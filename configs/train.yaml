@@ -3,11 +3,11 @@ defaults:
   - _self_
 
 dataset:
-  root: TODO  # Set to your local ImageNet directory.
+  root: ???  # Set to your local ImageNet directory.
 
 explainer:
   dinov3_path: dinov3
-  backbone_weights: TODO  # Set to your downloaded DINOv3 ViT-L/16 weights (.pth).
+  backbone_weights: ???  # Set to your downloaded DINOv3 ViT-L/16 weights (.pth).
 
 hydra:
   job:

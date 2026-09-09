@@ -99,6 +99,8 @@ class EvalConfig:
     percentile_step_pct: float = 0.05
     ref_im: str = "mean"
     cls_to_eval: Literal["prediction", "ground_truth"] = "prediction"
+    batch_size: int = 32
+    num_workers: int = 4
 
 
 @dataclass
